@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-// dotenv should be loaded only once at the entry point (index.js)
+require('dotenv').config();
 
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
