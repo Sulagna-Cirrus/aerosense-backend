@@ -39,4 +39,5 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+  console.log(`Frontend and backend are now served from the same port`);
+});
