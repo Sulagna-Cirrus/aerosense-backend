@@ -9,10 +9,17 @@ require('./config/db'); // Import database configuration
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+// Force port 5000 for consistency
+const PORT = 5000;
+console.log('Using PORT from config:', process.env.PORT);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5000', 'http://your-production-domain.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Serve static files from uploads directory

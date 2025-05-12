@@ -52,7 +52,7 @@ const getProfileByUserId = async (userId) => {
  * @returns {Object} Updated profile
  */
 const updateProfile = async (userId, profileData) => {
-  const { bio, phone, address } = profileData;
+  const { bio, phone, address, organization, role, fullName } = profileData;
   
   // First check if profile exists
   const profileCheck = await pool.query(
@@ -71,12 +71,14 @@ const updateProfile = async (userId, profileData) => {
     SET bio = COALESCE($1, bio),
         phone = COALESCE($2, phone),
         address = COALESCE($3, address),
+        organization = COALESCE($4, organization),
+        role = COALESCE($5, role),
         updated_at = CURRENT_TIMESTAMP
-    WHERE user_id = $4
-    RETURNING id, user_id, profile_image, bio, phone, address
+    WHERE user_id = $6
+    RETURNING id, user_id, profile_image, bio, phone, address, organization, role
   `;
   
-  const result = await pool.query(query, [bio, phone, address, userId]);
+  const result = await pool.query(query, [bio, phone, address, organization, role, userId]);
   return formatProfile(result.rows[0]);
 };
 

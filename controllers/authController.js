@@ -71,6 +71,54 @@ exports.login = async (req, res) => {
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
+/**
+ * Update user password controller
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+exports.updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Validate inputs
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current password and new password are required' });
+    }
+
+    // Get user from database
+    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password in database
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+
+    // Return success response
+    return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('Password update error:', err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+/**
+ * Get user profile controller
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.profile = async (req, res) => {
   try {
     // Get user profile from service
